@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.docn.aitra.web.generator.mapper.TranslationsMapper">
+
+    <resultMap id="BaseResultMap" type="net.docn.aitra.web.generator.domain.Translations">
+            <id property="translationId" column="translation_id" jdbcType="INTEGER"/>
+            <result property="userEmail" column="user_email" jdbcType="VARCHAR"/>
+            <result property="providerName" column="provider_name" jdbcType="VARCHAR"/>
+            <result property="sourceText" column="source_text" jdbcType="VARCHAR"/>
+            <result property="translatedText" column="translated_text" jdbcType="VARCHAR"/>
+            <result property="sourceLangName" column="source_lang_name" jdbcType="VARCHAR"/>
+            <result property="targetLangName" column="target_lang_name" jdbcType="VARCHAR"/>
+            <result property="status" column="status" jdbcType="VARCHAR"/>
+            <result property="translatedAt" column="translated_at" jdbcType="TIMESTAMP"/>
+            <result property="createdAt" column="created_at" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        translation_id,user_email,provider_name,
+        source_text,translated_text,source_lang_name,
+        target_lang_name,status,translated_at,
+        created_at
+    </sql>
+</mapper>
