@@ -1,5 +1,7 @@
-package net.docn.www.aitra.demos.web.TranslateController;
+package net.docn.aitra.web.TranslateController;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import net.docn.aitra.web.generator.domain.Translations;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,7 @@ public class TranslationController {
             String translatedText = translationService.translate(request.getSourceText(), request.getSourceLanguage(), request.getTargetLanguage(), request.getUserEmail());
             response.put("translatedText", translatedText);
             // 创建并保存翻译记录
-            Translation translation = new Translation();
+            Translations translation = new Translations();
             translation.setUserEmail(request.getUserEmail()); // 向数据库存用户id
             translation.setProviderName(request.getTranslationSource()); // 存翻译厂商名
             translation.setSourceText(request.getSourceText()); // 存原文
@@ -53,7 +55,7 @@ public class TranslationController {
 
 
     @GetMapping("/history")
-    public List<Translation> getTranslationHistory(@RequestParam String userEmail) {
-        return translationRepository.getTranslationsByUserEmail(userEmail);
+    public IPage<Translations> getTranslationHistory(@RequestParam String userEmail,@RequestParam long current) {
+        return translationRepository.getTranslationsByUserEmail(userEmail,current);
     }
 }

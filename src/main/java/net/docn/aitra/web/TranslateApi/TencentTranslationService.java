@@ -1,12 +1,15 @@
-package net.docn.www.aitra.demos.web.TranslateApi;
+package net.docn.aitra.web.TranslateApi;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.docn.www.aitra.demos.web.TranslateController.Translation;
-import net.docn.www.aitra.demos.web.TranslateController.TranslationService;
+import net.docn.aitra.web.TranslateController.Translation;
+import net.docn.aitra.web.TranslateController.TranslationService;
+import net.docn.aitra.web.generator.domain.Translations;
+import net.docn.aitra.web.generator.mapper.TranslationsMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,8 @@ import java.util.*;
 @Service("TencentTranslationService")
 public class TencentTranslationService implements TranslationService {
 
+    @Autowired
+    private TranslationsMapper translationsMapper;
     private static final Logger logger = LoggerFactory.getLogger(TencentTranslationService.class);
 
     @Value("${tencent.api.url}")
@@ -40,14 +45,6 @@ public class TencentTranslationService implements TranslationService {
     @Value("${tencent.api.SecretKey}")
     private String tencentSecretKey;
 
-    @Value("${spring.datasource.url}")
-    private String databaseUrl;
-
-    @Value("${spring.datasource.username}")
-    private String databaseUsername;
-
-    @Value("${spring.datasource.password}")
-    private String databasePassword;
     private final RestTemplate restTemplate = new RestTemplate();
 
     @Override
@@ -59,30 +56,20 @@ public class TencentTranslationService implements TranslationService {
         try {
             String response = doRequest(tencentSecretId, tencentSecretKey, "tmt", "2018-03-21", "TextTranslate", body, region, token);
             String translatedText = extractTranslatedText(response);
-           // saveTranslation(new Translation(text, translatedText, sourceLang, targetLang, userEmail));
             return translatedText;
         } catch (Exception e) {
             throw new IOException("Translation failed: " + e.getMessage(), e);
         }
     }
 
+
     @Override
-    public void saveTranslation(Translation translation) {
-        try (Connection connection = DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword)) {
-            String query = "INSERT INTO Translations (user_email, provider_name, source_text, translated_text, source_lang_name, target_lang_name, status, translated_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, translation.getUserEmail());
-                preparedStatement.setString(2, translation.getProviderName());
-                preparedStatement.setString(3, translation.getSourceText());
-                preparedStatement.setString(4, translation.getTranslatedText());
-                preparedStatement.setString(5, translation.getSourceLangName());
-                preparedStatement.setString(6, translation.getTargetLangName());
-                preparedStatement.setString(7, translation.getStatus());
-                preparedStatement.setTimestamp(8, java.sql.Timestamp.valueOf(translation.getTranslatedAt()));
-                preparedStatement.setTimestamp(9, java.sql.Timestamp.valueOf(translation.getCreatedAt()));
-                preparedStatement.executeUpdate();
-            }
-        } catch (SQLException e) {
+    public void saveTranslation(Translations translation) {
+        try {
+            int result = translationsMapper.insert(translation);
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

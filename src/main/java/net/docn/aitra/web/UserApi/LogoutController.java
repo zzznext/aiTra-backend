@@ -1,4 +1,4 @@
-package net.docn.www.aitra.demos.web.UserApi;
+package net.docn.aitra.web.UserApi;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

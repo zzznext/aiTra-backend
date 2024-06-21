@@ -1,6 +1,10 @@
-package net.docn.www.aitra.demos.web.TranslateController;
+package net.docn.aitra.web.TranslateController;
 
-import net.docn.www.aitra.demos.web.TranslateController.Translation;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import net.docn.aitra.web.generator.domain.Translations;
+import net.docn.aitra.web.generator.mapper.TranslationsMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,13 +16,24 @@ import java.util.List;
 
 @Repository
 public class TranslationRepository {
+    @Autowired
+    private TranslationsMapper translationsMapper;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<Translation> getTranslationsByUserEmail(String userEmail) {
-        String sql = "SELECT * FROM translations WHERE user_email = ?";
-        return jdbcTemplate.query(sql, new Object[]{userEmail}, new TranslationRowMapper());
+    /*
+    *getTranslationsByUserEmail条件分页查询
+    * 实现历史记录的分页查询
+    * 2024年6月19日08:55:04
+    * author zzznext
+     */
+    public IPage<Translations> getTranslationsByUserEmail(String userEmail,long current) {
+        QueryWrapper wrapper = new QueryWrapper();
+        wrapper.eq("user_email",userEmail);
+        IPage<Translations> page = new Page<>(current,10);
+        IPage<Translations> translationsIPage = translationsMapper.selectPage(page,wrapper);
+        return  translationsIPage;
     }
 
     private static class TranslationRowMapper implements RowMapper<Translation> {

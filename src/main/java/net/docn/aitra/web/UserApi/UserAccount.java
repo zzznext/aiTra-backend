@@ -1,4 +1,4 @@
-package net.docn.www.aitra.demos.web.UserApi;
+package net.docn.aitra.web.UserApi;
 
 
 public class UserAccount {

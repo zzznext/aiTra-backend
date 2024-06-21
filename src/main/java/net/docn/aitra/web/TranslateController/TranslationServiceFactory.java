@@ -1,4 +1,4 @@
-package net.docn.www.aitra.demos.web.TranslateController;
+package net.docn.aitra.web.TranslateController;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

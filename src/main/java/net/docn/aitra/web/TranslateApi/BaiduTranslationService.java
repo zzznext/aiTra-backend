@@ -1,12 +1,14 @@
-package net.docn.www.aitra.demos.web.TranslateApi;
+package net.docn.aitra.web.TranslateApi;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.docn.www.aitra.demos.web.TranslateController.Translation;
-import net.docn.www.aitra.demos.web.TranslateController.TranslationService;
+import net.docn.aitra.web.TranslateController.TranslationService;
+import net.docn.aitra.web.generator.domain.Translations;
+import net.docn.aitra.web.generator.mapper.TranslationsMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -14,10 +16,6 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -25,6 +23,8 @@ import java.util.Map;
 @Service("BaiduTranslationService")
 public class BaiduTranslationService implements TranslationService {
 
+    @Autowired
+    private TranslationsMapper translationsMapper;
     private static final Logger logger = LoggerFactory.getLogger(BaiduTranslationService.class);
 
     @Value("${baidu.api.url}")
@@ -32,14 +32,6 @@ public class BaiduTranslationService implements TranslationService {
 
     @Value("${baidu.api.accessToken}")
     private String accessToken;
-    @Value("${spring.datasource.url}")
-    private String databaseUrl;
-
-    @Value("${spring.datasource.username}")
-    private String databaseUsername;
-
-    @Value("${spring.datasource.password}")
-    private String databasePassword;
 
     private final RestTemplate restTemplate = new RestTemplate();
 
@@ -59,23 +51,14 @@ public class BaiduTranslationService implements TranslationService {
         }
     }
 
+
     @Override
-    public void saveTranslation(Translation translation) {
-        try (Connection connection = DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword)) {
-            String query = "INSERT INTO Translations (user_email, provider_name, source_text, translated_text, source_lang_name, target_lang_name, status, translated_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
-                preparedStatement.setString(1, translation.getUserEmail());
-                preparedStatement.setString(2, translation.getProviderName());
-                preparedStatement.setString(3, translation.getSourceText());
-                preparedStatement.setString(4, translation.getTranslatedText());
-                preparedStatement.setString(5, translation.getSourceLangName());
-                preparedStatement.setString(6, translation.getTargetLangName());
-                preparedStatement.setString(7, translation.getStatus());
-                preparedStatement.setTimestamp(8, java.sql.Timestamp.valueOf(translation.getTranslatedAt()));
-                preparedStatement.setTimestamp(9, java.sql.Timestamp.valueOf(translation.getCreatedAt()));
-                preparedStatement.executeUpdate();
-            }
-        } catch (SQLException e) {
+    public void saveTranslation(Translations translation) {
+        try {
+            int result = translationsMapper.insert(translation);
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

@@ -1,10 +1,12 @@
-package net.docn.www.aitra.demos.web.TranslateApi;
+package net.docn.aitra.web.TranslateApi;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import net.docn.www.aitra.demos.web.TranslateController.Translation;
-import net.docn.www.aitra.demos.web.TranslateController.TranslationService;
+import net.docn.aitra.web.TranslateController.TranslationService;
+import net.docn.aitra.web.generator.domain.Translations;
+import net.docn.aitra.web.generator.mapper.TranslationsMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -19,14 +21,12 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 @Service("YoudaoTranslationService")
 public class YoudaoTranslationService implements TranslationService {
 
+    @Autowired
+    private TranslationsMapper translationsMapper;
     @Value("${youdao.api.url}")
     private String youdaoUrl;
 
@@ -36,14 +36,6 @@ public class YoudaoTranslationService implements TranslationService {
     @Value("${youdao.api.appSecret}")
     private String appSecret;
 
-    @Value("${spring.datasource.url}")
-    private String databaseUrl;
-
-    @Value("${spring.datasource.username}")
-    private String databaseUsername;
-
-    @Value("${spring.datasource.password}")
-    private String databasePassword;
 
     @Override
     public String translate(String text, String sourceLang, String targetLang,String useremail) throws IOException {
@@ -69,24 +61,14 @@ public class YoudaoTranslationService implements TranslationService {
 
 
 
-    @Override
-    public void saveTranslation(Translation translation) {
-        try (Connection connection = DriverManager.getConnection(databaseUrl, databaseUsername, databasePassword)) {
-            String query = "INSERT INTO Translations (user_email, provider_name, source_text, translated_text, source_lang_name, target_lang_name, status, translated_at, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-            try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
 
-                preparedStatement.setString(1, translation.getUserEmail());
-                preparedStatement.setString(2, translation.getProviderName());
-                preparedStatement.setString(3, translation.getSourceText());
-                preparedStatement.setString(4, translation.getTranslatedText());
-                preparedStatement.setString(5, translation.getSourceLangName());
-                preparedStatement.setString(6, translation.getTargetLangName());
-                preparedStatement.setString(7, translation.getStatus());
-                preparedStatement.setTimestamp(8, java.sql.Timestamp.valueOf(translation.getTranslatedAt()));
-                preparedStatement.setTimestamp(9, java.sql.Timestamp.valueOf(translation.getCreatedAt()));
-                preparedStatement.executeUpdate();
-            }
-        } catch (SQLException e) {
+    @Override
+    public void saveTranslation(Translations translation) {
+        try {
+            int result = translationsMapper.insert(translation);
+
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

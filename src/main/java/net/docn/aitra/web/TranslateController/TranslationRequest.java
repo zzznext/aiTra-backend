@@ -1,4 +1,4 @@
-package net.docn.www.aitra.demos.web.TranslateController;
+package net.docn.aitra.web.TranslateController;
 
 public class TranslationRequest {
     private String userEmail;//用户Email

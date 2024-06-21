@@ -1,6 +1,12 @@
-package net.docn.www.aitra.demos.web.UserApi;
+package net.docn.aitra.web.generator.domain;
 
-public class User {
+
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+
+@Data
+@TableName("users")
+public class Users {
     private Long userId;
     private String username;
     private String email;

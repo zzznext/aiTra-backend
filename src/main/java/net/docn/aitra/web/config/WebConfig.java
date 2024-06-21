@@ -1,4 +1,4 @@
-package net.docn.www.aitra.demos.web.config;
+package net.docn.aitra.web.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

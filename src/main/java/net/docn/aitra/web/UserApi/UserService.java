@@ -1,4 +1,4 @@
-package net.docn.www.aitra.demos.web.UserApi;
+package net.docn.aitra.web.UserApi;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
